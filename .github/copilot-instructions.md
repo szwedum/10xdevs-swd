@@ -9,8 +9,6 @@ GymRatPlanner is a web application that helps users plan their gym workouts.
 - React 19
 - Tailwind 4
 - Shadcn/ui
-- Supabase
-- GitHub Actions
 
 ## Project Structure
 
@@ -44,21 +42,6 @@ When modifying the directory structure, always update this section.
 - Use guard clauses to handle preconditions and invalid states early.
 - Implement proper error logging and user-friendly error messages.
 - Consider using custom error types or error factories for consistent error handling.
-
-### Guidelines for documentation
-
-- Update relevant documentation in /docs when modifying features
-- Keep README.md in sync with new capabilities
-- Maintain changelog entries in CHANGELOG.md
-
-### Guidelines for static analysis
-
-- Configure project-specific rules in eslint.config.js to enforce consistent coding standards
-- Use shareable configs like eslint-config-airbnb or eslint-config-standard as a foundation
-- Implement custom rules for {{project_specific_patterns}} to maintain codebase consistency
-- Configure integration with Prettier to avoid rule conflicts for code formatting
-- Use the --fix flag in CI/CD pipelines to automatically correct fixable issues
-- Implement staged linting with husky and lint-staged to prevent committing non-compliant code
 
 ## Frontend
 
@@ -128,20 +111,3 @@ When modifying the directory structure, always update this section.
 - Use Zod schemas to validate data exchanged with the backend.
 - Use supabase from context.locals in Astro routes instead of importing supabaseClient directly
 - Use SupabaseClient type from `src/db/supabase.client.ts`, not from `@supabase/supabase-js`
-
-## DevOps
-
-### Guidelines for CI/CD
-
-#### GitHub Actions
-
-- Check if `package.json` exists in project root and summarize key scripts
-- Check if `.nvmrc` exists in project root
-- Check if `.env.example` exists in project root to identify key `env:` variables
-- Always use terminal command: `git branch -a | cat` to verify whether we use `main` or `master` branch
-- Always use `env:` variables and secrets attached to jobs instead of global workflows
-- Always use `npm ci` for Node-based dependency setup
-- Extract common steps into composite actions in separate files
-- Once you're done, as a final step conduct the following: for each public action always use <tool>"Run Terminal"</tool> to see what is the most up-to-date version (use only major version) - extract tag_name from the response:
-- ```bash curl -s https://api.github.com/repos/{owner}/{repo}/releases/latest ```
-

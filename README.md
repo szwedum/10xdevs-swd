@@ -67,7 +67,7 @@ Gym users who follow structured workout routines and want to track their progres
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/szwedum/10xdevs-swd.git
    cd 10xdevs-swd
    ```
 
@@ -91,7 +91,7 @@ Gym users who follow structured workout routines and want to track their progres
 
 5. **Open your browser**
    
-   Navigate to `http://localhost:4321` (or the port shown in your terminal)
+   Navigate to `http://localhost:3000` (or the port shown in your terminal)
 
 ## Available Scripts
 

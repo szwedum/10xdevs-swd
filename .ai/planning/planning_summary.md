@@ -48,7 +48,7 @@
 
 10. **User account system & authentication**:
     - Users authenticate with **email and password**.
-    - **JWT tokens** will be used for authentication/authorization.
+    - **Supabase Auth** manages authentication/authorization (email + password, sessions handled internally).
     - No specific password complexity or security policy has been defined yet.
 
 11. **User profile**:
@@ -120,7 +120,7 @@ a. **Main functional requirements**
 
 - **Authentication & authorization**
   - Sign-up and login using **email and password**.
-  - Session management using **JWT tokens**.
+  - Session management handled by **Supabase Auth**.
   - Basic auth flows (login, logout) required; exact security policies (e.g., password rules, reset flows) remain to be clarified.
 
 - **User profile**
@@ -234,7 +234,7 @@ d. **Unresolved issues / areas for later clarification (briefly in summary)**
 - Detailed **security and account management** behavior:
   - Password policies.
   - Password reset and email verification flows.
-  - Session expiry and secure handling of JWTs.
+  - Session expiry and secure handling of Supabase session tokens.
 - **Workout deletion** behavior and whether historical workouts can be edited or removed.
 - **Concurrency and conflict handling** (multiple devices editing/logging at once).
 - Concrete **analytics solution** and **timeframe** for measuring success criteria (beyond raw events in the database).
@@ -251,7 +251,7 @@ d. **Unresolved issues / areas for later clarification (briefly in summary)**
      - Password strength/complexity requirements.
      - Password reset and account recovery mechanisms.
      - Email verification.
-     - Session expiration and refresh strategies for JWTs.
+     - Session expiration and refresh strategies for Supabase session tokens.
 
 3. **Workout lifecycle management**:
    - Not yet specified:

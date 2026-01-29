@@ -20,7 +20,7 @@ Web application accessible via desktop, laptop, and mobile browsers. No native m
 
 - Frontend: Astro 5 with React, TypeScript, and Tailwind CSS
 - Backend: Supabase with PostgreSQL database
-- Authentication: JWT tokens
+- Authentication: Supabase Auth (built-in JWT sessions)
 - CI/CD: GitHub Actions
 
 ## 2. User Problem
@@ -43,7 +43,7 @@ GymRatPlanner solves this by providing a focused, template-based system that aut
 - FR-001: Users must be able to sign up using email and password
 - FR-002: Users must be able to log in using email and password
 - FR-003: Users must be able to log out
-- FR-004: System must use JWT tokens for session management
+- FR-004: System must use Supabase Auth session mechanism for session management
 - FR-005: All workout templates and data must be associated with the authenticated user
 - FR-006: Users can only access their own workout data
 
@@ -192,7 +192,7 @@ US-002: User Login
 - Acceptance Criteria:
   - User can enter email and password on login page
   - System validates credentials against stored user data
-  - System generates JWT token upon successful login
+  - System establishes a Supabase Auth session upon successful login
   - User is redirected to templates page after login
   - System displays error message for invalid credentials
   - System displays error message if required fields are empty
@@ -202,7 +202,7 @@ US-003: User Logout
 - Description: As a logged-in user, I want to log out so that my account is secure when I'm done using the application.
 - Acceptance Criteria:
   - User can access logout option from application
-  - System invalidates JWT token upon logout
+  - System invalidates Supabase Auth session upon logout
   - User is redirected to login page after logout
   - User cannot access protected pages after logout without logging in again
 
@@ -210,10 +210,10 @@ US-004: Session Management
 - Title: System maintains user session
 - Description: As a logged-in user, I want my session to be maintained so that I don't have to log in repeatedly during normal usage.
 - Acceptance Criteria:
-  - System uses JWT tokens to maintain user session
-  - Protected routes require valid JWT token
-  - System validates JWT token on each protected request
-  - User is redirected to login if token is invalid or missing
+  - System uses Supabase Auth sessions to maintain user session
+  - Protected routes require a valid Supabase Auth session (enforced via RLS/auth.uid())
+  - System relies on Supabase RLS/auth.uid() to validate the session on each protected request
+  - User is redirected to login if session is invalid or missing
 
 ### 5.2 Exercise Management
 
@@ -439,11 +439,11 @@ US-024: Session Security
 - Title: User session is secure
 - Description: As a user, I want my session to be secure so that my account cannot be compromised.
 - Acceptance Criteria:
-  - JWT tokens are used for authentication
-  - Tokens are transmitted securely
-  - Invalid tokens are rejected
-  - Expired tokens require re-login
-  - Logout invalidates the token
+  - Supabase Auth sessions (JWT-based) are used for authentication
+  - Session tokens are transmitted securely
+  - Invalid or revoked sessions are rejected
+  - Expired sessions require re-login
+  - Logout clears the Supabase Auth session on the client
 
 ## 6. Success Metrics
 

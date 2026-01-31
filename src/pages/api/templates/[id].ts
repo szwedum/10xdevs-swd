@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 
-import { DEFAULT_USER_ID, supabaseClient } from "../../../db/supabase.client";
+import { supabaseClient } from "../../../db/supabase.client";
 import type { ErrorResponseDTO, DeleteResponseDTO } from "../../../types";
 import { TemplateService } from "../../../lib/services/template.service";
 
@@ -10,12 +10,23 @@ export const prerender = false;
 // UUID validation schema
 const uuidSchema = z.string().uuid("Invalid template ID format");
 
-export const GET: APIRoute = async ({ params }): Promise<Response> => {
+export const GET: APIRoute = async ({ params, locals }): Promise<Response> => {
+  const userId = locals.user?.id;
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+        message: "Authentication required",
+      } as ErrorResponseDTO),
+      { status: 401, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   try {
     // Validate template ID
     const templateId = uuidSchema.parse(params.id);
 
-    const result = await TemplateService.getTemplateDetails(supabaseClient, templateId, DEFAULT_USER_ID);
+    const result = await TemplateService.getTemplateDetails(supabaseClient, templateId, userId);
 
     return new Response(JSON.stringify(result), {
       status: 200,
@@ -62,11 +73,22 @@ export const GET: APIRoute = async ({ params }): Promise<Response> => {
   }
 };
 
-export const DELETE: APIRoute = async ({ params }): Promise<Response> => {
+export const DELETE: APIRoute = async ({ params, locals }): Promise<Response> => {
+  const userId = locals.user?.id;
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+        message: "Authentication required",
+      } as ErrorResponseDTO),
+      { status: 401, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   try {
     const templateId = uuidSchema.parse(params.id);
 
-    const result: DeleteResponseDTO = await TemplateService.deleteTemplate(supabaseClient, templateId, DEFAULT_USER_ID);
+    const result: DeleteResponseDTO = await TemplateService.deleteTemplate(supabaseClient, templateId, userId);
 
     return new Response(JSON.stringify(result), {
       status: 200,

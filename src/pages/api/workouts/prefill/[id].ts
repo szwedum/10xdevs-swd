@@ -1,19 +1,30 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 
-import { DEFAULT_USER_ID, supabaseClient } from "../../../../db/supabase.client";
+import { supabaseClient } from "../../../../db/supabase.client";
 import { workoutPrefillParamsSchema } from "../../../../lib/validation/workout.prefill.schema";
 import type { ErrorResponseDTO } from "../../../../types";
 import { WorkoutService } from "../../../../lib/services/workout.service";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params }): Promise<Response> => {
+export const GET: APIRoute = async ({ params, locals }): Promise<Response> => {
+  const userId = locals.user?.id;
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+        message: "Authentication required",
+      } as ErrorResponseDTO),
+      { status: 401, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   try {
     // Validate template ID
     const { id: templateId } = workoutPrefillParamsSchema.parse(params);
 
-    const result = await WorkoutService.getPrefillData(supabaseClient, templateId, DEFAULT_USER_ID);
+    const result = await WorkoutService.getPrefillData(supabaseClient, templateId, userId);
 
     return new Response(JSON.stringify(result), {
       status: 200,

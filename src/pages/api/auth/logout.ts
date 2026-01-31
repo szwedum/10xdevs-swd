@@ -1,23 +1,16 @@
 import type { APIRoute } from "astro";
-import { supabaseClient } from "../../../db/supabase.client";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import type { ErrorResponseDTO } from "../../../types";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ cookies }): Promise<Response> => {
+export const POST: APIRoute = async ({ request, cookies }): Promise<Response> => {
   try {
-    const accessToken = cookies.get("sb-access-token")?.value;
-    const refreshToken = cookies.get("sb-refresh-token")?.value;
+    const supabase = createSupabaseServerInstance({ cookies, headers: request.headers });
 
-    if (accessToken && refreshToken) {
-      await supabaseClient.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
+    await supabase.auth.signOut();
 
-      await supabaseClient.auth.signOut();
-    }
-
+    // Explicitly delete the manual cookies used by React components
     cookies.delete("sb-access-token", { path: "/" });
     cookies.delete("sb-refresh-token", { path: "/" });
 
@@ -32,9 +25,6 @@ export const POST: APIRoute = async ({ cookies }): Promise<Response> => {
     );
   } catch (err) {
     console.error("Logout error:", err);
-
-    cookies.delete("sb-access-token", { path: "/" });
-    cookies.delete("sb-refresh-token", { path: "/" });
 
     return new Response(
       JSON.stringify({

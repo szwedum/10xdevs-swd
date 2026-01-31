@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 
-import { DEFAULT_USER_ID, supabaseClient } from "../../../db/supabase.client";
+import { supabaseClient } from "../../../db/supabase.client";
 import { createTemplateSchema } from "../../../lib/validation/template.schema";
 import type { ErrorResponseDTO, ValidationErrorResponseDTO } from "../../../types";
 import { TemplateService } from "../../../lib/services/template.service";
@@ -21,12 +21,23 @@ export const queryParamsSchema = z.object({
 // ---------------------------------------------------------------------------
 // GET /api/templates handler (Step 3 of implementation plan)
 // ---------------------------------------------------------------------------
-export const POST: APIRoute = async ({ request }): Promise<Response> => {
+export const POST: APIRoute = async ({ request, locals }): Promise<Response> => {
+  const userId = locals.user?.id;
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+        message: "Authentication required",
+      } as ErrorResponseDTO),
+      { status: 401, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   try {
     const body = await request.json();
     const validatedBody = createTemplateSchema.parse(body);
 
-    const result = await TemplateService.createTemplate(supabaseClient, DEFAULT_USER_ID, validatedBody);
+    const result = await TemplateService.createTemplate(supabaseClient, userId, validatedBody);
 
     return new Response(JSON.stringify(result), {
       status: 201,
@@ -64,9 +75,9 @@ export const POST: APIRoute = async ({ request }): Promise<Response> => {
       "Error creating template:",
       err instanceof Error
         ? {
-            message: err.message,
-            stack: err.stack,
-          }
+          message: err.message,
+          stack: err.stack,
+        }
         : err
     );
     const body: ErrorResponseDTO = {
@@ -80,7 +91,18 @@ export const POST: APIRoute = async ({ request }): Promise<Response> => {
   }
 };
 
-export const GET: APIRoute = async ({ url }): Promise<Response> => {
+export const GET: APIRoute = async ({ url, locals }): Promise<Response> => {
+  const userId = locals.user?.id;
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+        message: "Authentication required",
+      } as ErrorResponseDTO),
+      { status: 401, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   // Validate query parameters
   let params: z.infer<typeof queryParamsSchema>;
   try {
@@ -115,10 +137,10 @@ export const GET: APIRoute = async ({ url }): Promise<Response> => {
   // Business logic via service layer
   try {
     console.log("Calling TemplateService with params:", {
-      userId: DEFAULT_USER_ID,
+      userId,
       params,
     });
-    const result = await TemplateService.getTemplates(supabaseClient, DEFAULT_USER_ID, params);
+    const result = await TemplateService.getTemplates(supabaseClient, userId, params);
     console.log("Service returned result:", result);
     return new Response(JSON.stringify(result), {
       status: 200,

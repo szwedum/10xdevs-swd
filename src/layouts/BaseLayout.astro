@@ -1,5 +1,6 @@
 ---
 import "../styles/globals.css";
+import { UserMenu } from "../components/navigation/UserMenu";
 
 interface Props {
   title: string;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 const { title, description = "Track your gym workouts with GymRatPlanner" } = Astro.props;
+const { user } = Astro.locals;
 ---
 
 <!doctype html>
@@ -31,6 +33,7 @@ const { title, description = "Track your gym workouts with GymRatPlanner" } = As
           </div>
           <nav class="flex flex-1 items-center justify-between space-x-2 md:justify-end">
             <slot name="nav" />
+            {user && <UserMenu userEmail={user.email} client:load />}
           </nav>
         </div>
       </header>

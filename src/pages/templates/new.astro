@@ -1,0 +1,47 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import CreateTemplateForm from "@/components/templates/CreateTemplateForm";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/db/database.types";
+
+export const prerender = false;
+
+const accessToken = Astro.cookies.get("sb-access-token")?.value;
+const refreshToken = Astro.cookies.get("sb-refresh-token")?.value;
+
+if (!accessToken || !refreshToken) {
+  return Astro.redirect("/login");
+}
+
+const supabase = createClient<Database>(import.meta.env.SUPABASE_URL, import.meta.env.SUPABASE_KEY);
+
+const {
+  data: { session },
+  error,
+} = await supabase.auth.setSession({
+  access_token: accessToken,
+  refresh_token: refreshToken,
+});
+
+if (error || !session) {
+  Astro.cookies.delete("sb-access-token", { path: "/" });
+  Astro.cookies.delete("sb-refresh-token", { path: "/" });
+  return Astro.redirect("/login");
+}
+---
+
+<BaseLayout title="Create Template">
+  <div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold">Create Template</h1>
+      <p class="text-muted-foreground mt-2">Create a new workout template by adding exercises and configuring sets and reps.</p>
+    </div>
+    <CreateTemplateForm 
+      supabaseUrl={import.meta.env.SUPABASE_URL}
+      supabaseKey={import.meta.env.SUPABASE_KEY}
+      accessToken={accessToken}
+      refreshToken={refreshToken}
+      client:only="react"
+    />
+  </div>
+</BaseLayout>

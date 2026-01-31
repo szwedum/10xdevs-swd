@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { supabaseClient } from "../../../db/supabase.client";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import type { ErrorResponseDTO } from "../../../types";
 
 export const prerender = false;
@@ -15,7 +15,9 @@ export const POST: APIRoute = async ({ request, cookies }): Promise<Response> =>
     const body = await request.json();
     const { email, password } = loginSchema.parse(body);
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
+    const supabase = createSupabaseServerInstance({ cookies, headers: request.headers });
+
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -46,10 +48,11 @@ export const POST: APIRoute = async ({ request, cookies }): Promise<Response> =>
       );
     }
 
+    // Set explicit cookies for React components to use
     cookies.set("sb-access-token", data.session.access_token, {
       path: "/",
       httpOnly: true,
-      secure: import.meta.env.PROD,
+      secure: true,
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
@@ -57,7 +60,7 @@ export const POST: APIRoute = async ({ request, cookies }): Promise<Response> =>
     cookies.set("sb-refresh-token", data.session.refresh_token, {
       path: "/",
       httpOnly: true,
-      secure: import.meta.env.PROD,
+      secure: true,
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 30, // 30 days
     });

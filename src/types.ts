@@ -211,3 +211,20 @@ export interface ErrorResponseDTO {
   error: string;
   message: string;
 }
+
+// ============================================================================
+// Authentication DTOs
+// ============================================================================
+
+export interface AuthUserDTO {
+  id: string;
+  email: string;
+}
+
+export interface LoginResponseDTO extends SuccessMessageDTO {
+  user: AuthUserDTO;
+}
+
+export interface SignupResponseDTO extends SuccessMessageDTO {
+  user: AuthUserDTO;
+}

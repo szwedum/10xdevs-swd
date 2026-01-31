@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 
-import { DEFAULT_USER_ID, supabaseClient } from "../../../db/supabase.client";
+import { supabaseClient } from "../../../db/supabase.client";
 import { workoutQuerySchema } from "../../../lib/validation/workout.query.schema";
 import { createWorkoutSchema } from "../../../lib/validation/workout.schema";
 import type { ErrorResponseDTO, ValidationErrorResponseDTO } from "../../../types";
@@ -9,12 +9,23 @@ import { WorkoutService } from "../../../lib/services/workout.service";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ url }): Promise<Response> => {
+export const GET: APIRoute = async ({ url, locals }): Promise<Response> => {
+  const userId = locals.user?.id;
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+        message: "Authentication required",
+      } as ErrorResponseDTO),
+      { status: 401, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   try {
     // Validate and parse query parameters
     const params = workoutQuerySchema.parse(Object.fromEntries(url.searchParams));
 
-    const result = await WorkoutService.getWorkouts(supabaseClient, DEFAULT_USER_ID, {
+    const result = await WorkoutService.getWorkouts(supabaseClient, userId, {
       limit: params.limit,
       offset: params.offset,
       fromDate: params.from_date,
@@ -53,12 +64,23 @@ export const GET: APIRoute = async ({ url }): Promise<Response> => {
   }
 };
 
-export const POST: APIRoute = async ({ request }): Promise<Response> => {
+export const POST: APIRoute = async ({ request, locals }): Promise<Response> => {
+  const userId = locals.user?.id;
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+        message: "Authentication required",
+      } as ErrorResponseDTO),
+      { status: 401, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   try {
     const body = await request.json();
     const validatedBody = createWorkoutSchema.parse(body);
 
-    const result = await WorkoutService.createWorkout(supabaseClient, DEFAULT_USER_ID, validatedBody);
+    const result = await WorkoutService.createWorkout(supabaseClient, userId, validatedBody);
 
     return new Response(JSON.stringify(result), {
       status: 201,

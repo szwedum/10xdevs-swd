@@ -1,0 +1,16 @@
+---
+import AuthLayout from '../layouts/AuthLayout.astro';
+import SignUpForm from '../components/auth/SignUpForm';
+---
+
+<AuthLayout title="Sign Up">
+  <p slot="header" class="text-sm text-muted-foreground">
+    Create an account to start tracking your workouts
+  </p>
+
+  <SignUpForm client:load />
+
+  <p slot="footer" class="px-8 text-center text-sm text-muted-foreground">
+    <a href="/login" class="hover:text-brand underline underline-offset-4">Already have an account? Log in</a>
+  </p>
+</AuthLayout>

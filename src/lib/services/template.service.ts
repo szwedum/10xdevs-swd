@@ -4,6 +4,7 @@ import type { Database } from '../../db/database.types';
 import type {
     CreateTemplateCommand,
     CreateTemplateExerciseCommand,
+    DeleteResponseDTO,
     TemplateDetailDTO,
     TemplateListItemDTO,
     TemplateListResponseDTO,
@@ -193,6 +194,30 @@ export class TemplateService {
                 offset,
                 total: total ?? 0,
             },
+        };
+    }
+
+    public static async deleteTemplate(
+        supabase: SupabaseClient<Database>,
+        templateId: string,
+        userId: string,
+    ): Promise<DeleteResponseDTO> {
+        const { error } = await supabase
+            .from('templates')
+            .delete()
+            .eq('id', templateId)
+            .eq('user_id', userId);
+
+        if (error) {
+            if (error.code === 'PGRST116') {
+                throw new Error('Template not found');
+            }
+            throw new Error(`Error deleting template: ${error.message}`);
+        }
+
+        return {
+            message: 'Template deleted successfully',
+            deleted_id: templateId,
         };
     }
 }

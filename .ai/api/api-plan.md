@@ -1,8 +1,13 @@
-# REST API Plan - GymRatPlanner
+# REST API Plan - GymRatPlanner API Plan
+
+> **Current Implementation Status**: This document reflects the MVP implementation. Endpoints marked with "(Future Enhancement)" are planned for later phases.
+
+> **Authentication Note**: Currently using a fixed development user ID. Supabase Auth integration planned for production.
+
 
 ## 1. Resources
 
-The API is organized around the following main resources, each corresponding to database entities:
+The API is organized around the following main resources. All tables exist in the database, but not all have corresponding endpoints in the MVP:
 
 - **Exercises** → `exercises` table
 - **Templates** → `templates` table
@@ -14,6 +19,21 @@ The API is organized around the following main resources, each corresponding to 
 - **Event Logs** → `analytics.event_log` table
 
 ## 2. Endpoints
+
+### 2.1 Currently Implemented Endpoints
+
+1. **Exercise Management**
+   - GET /api/exercises - List exercises with search
+
+2. **Template Management**
+   - GET /api/templates - List templates
+   - GET /api/templates/:id - Get template details
+   - POST /api/templates - Create template
+
+3. **Workout Management**
+   - GET /api/workouts - List workout history
+   - POST /api/workouts - Log workout
+   - GET /api/workouts/prefill/:template_id - Get prefilled workout data
 
 ### 2.2 Exercises
 
@@ -54,7 +74,7 @@ Authorization: Bearer {access_token}
 
 ---
 
-#### GET /api/exercises/:id
+#### GET /api/exercises/:id (Future Enhancement)
 **Description:** Retrieve details of a specific exercise
 
 **Headers:**
@@ -217,7 +237,7 @@ Authorization: Bearer {access_token}
 
 ---
 
-#### DELETE /api/templates/:id
+#### DELETE /api/templates/:id (Future Enhancement)
 **Description:** Permanently delete a workout template
 
 **Headers:**
@@ -514,7 +534,7 @@ Authorization: Bearer {access_token}
 
 ---
 
-### 2.6 Event Logs
+### 2.6 Event Logs (Future Enhancement)
 
 #### POST /api/events
 **Description:** Log an analytics event
@@ -606,7 +626,14 @@ Authorization: Bearer {access_token}
 
 ## 3. Authentication and Authorization
 
-### 3.1 Authentication Mechanism
+### 3.1 Authentication Mechanism (Current Development State)
+
+**Development Mode with Fixed User ID**
+- Using `DEFAULT_USER_ID` for development
+- No token validation required in development
+- Database configured with RLS disabled
+
+### 3.2 Authentication Mechanism (Future Production State)
 
 **Supabase Auth with JWT-based Sessions**
 
@@ -616,7 +643,7 @@ The API uses Supabase Auth for authentication, which provides:
 - Secure token storage and transmission
 - Built-in session management
 
-### 3.2 Implementation Details
+### 3.3 Implementation Details (Future)
 
 **Token Format:**
 - Access tokens are JWTs signed by Supabase
@@ -633,7 +660,7 @@ The API uses Supabase Auth for authentication, which provides:
 - Token validation is handled by Supabase middleware
 - Invalid or expired tokens return `401 Unauthorized`
 
-### 3.3 Authorization Strategy
+### 3.4 Authorization Strategy (Future)
 
 **Row-Level Security (RLS) Policies**
 
@@ -658,7 +685,7 @@ Authorization is enforced at the database level using PostgreSQL RLS policies:
 - User ID from JWT is used in database queries
 - RLS policies enforce data access rules automatically
 
-### 3.4 Security Considerations
+### 3.5 Security Considerations (Future)
 
 **Token Security:**
 - Tokens transmitted over HTTPS only
@@ -701,6 +728,8 @@ Authorization is enforced at the database level using PostgreSQL RLS policies:
 - **Constraint**: Position must be unique within template (enforced by database)
 
 #### Workouts
+
+> Core workout tracking functionality
 - **logged_at**: Optional, defaults to current timestamp
 - **template_id**: Optional, must reference valid template owned by user
 - **exercises**: Required, minimum 1 exercise
@@ -717,7 +746,9 @@ Authorization is enforced at the database level using PostgreSQL RLS policies:
 - **weight**: Required, numeric, range 0-999.99, precision 1 decimal places
 - **Constraint**: Set index must be unique within workout exercise (enforced by database)
 
-#### Personal Bests
+#### Personal Bests (Future Enhancement)
+
+> Currently handled automatically by database triggers
 - **weight**: Required, numeric, range 0-999.99, precision 1 decimal places
 - **Constraint**: Composite primary key (user_id, exercise_id)
 
@@ -937,7 +968,9 @@ Authorization is enforced at the database level using PostgreSQL RLS policies:
 
 ## 7. Future Enhancements
 
-### 7.1 Additional Endpoints (Post-MVP)
+### 7.1 Additional Endpoints (Future Enhancements)
+
+The following endpoints were considered but not implemented in the MVP:
 - PATCH /api/templates/:id - Update template
 - DELETE /api/workouts/:id - Delete workout
 - PATCH /api/workouts/:id - Edit workout

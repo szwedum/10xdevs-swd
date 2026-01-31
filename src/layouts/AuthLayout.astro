@@ -1,0 +1,38 @@
+---
+import '../styles/globals.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} | GymRatPlanner</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="h-full bg-background text-foreground antialiased">
+    <div class="flex min-h-full flex-col justify-center">
+      <div class="container relative hidden h-screen flex-none p-10 md:block lg:w-1/2">
+        <div class="absolute inset-0 bg-muted" />
+      </div>
+      <div class="lg:p-8">
+        <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+          <div class="flex flex-col space-y-2 text-center">
+            <h1 class="text-2xl font-semibold tracking-tight">GymRatPlanner</h1>
+            <slot name="header" />
+          </div>
+          <slot />
+          <slot name="footer" />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

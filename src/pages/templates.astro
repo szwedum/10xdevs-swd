@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NavigationHeader from '../components/navigation/NavigationHeader.astro';
+import { TemplatesList } from '../components/templates/TemplatesList';
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '../db/database.types';
+
+export const prerender = false;
+
+const accessToken = Astro.cookies.get('sb-access-token')?.value;
+const refreshToken = Astro.cookies.get('sb-refresh-token')?.value;
+
+if (!accessToken || !refreshToken) {
+  return Astro.redirect('/login');
+}
+
+const supabase = createClient<Database>(
+  import.meta.env.SUPABASE_URL,
+  import.meta.env.SUPABASE_KEY
+);
+
+const { data: { session }, error } = await supabase.auth.setSession({
+  access_token: accessToken,
+  refresh_token: refreshToken,
+});
+
+if (error || !session) {
+  Astro.cookies.delete('sb-access-token', { path: '/' });
+  Astro.cookies.delete('sb-refresh-token', { path: '/' });
+  return Astro.redirect('/login');
+}
+---
+
+<BaseLayout title="Templates">
+  <NavigationHeader currentPath="/templates" slot="nav" />
+  <TemplatesList client:load />
+</BaseLayout>

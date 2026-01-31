@@ -1,0 +1,16 @@
+---
+import AuthLayout from '../layouts/AuthLayout.astro';
+import LoginForm from '../components/auth/LoginForm';
+---
+
+<AuthLayout title="Login">
+  <p slot="header" class="text-sm text-muted-foreground">
+    Enter your email and password to log in to your account
+  </p>
+
+  <LoginForm client:load />
+
+  <p slot="footer" class="px-8 text-center text-sm text-muted-foreground">
+    <a href="/signup" class="hover:text-brand underline underline-offset-4">Don't have an account? Sign Up</a>
+  </p>
+</AuthLayout>

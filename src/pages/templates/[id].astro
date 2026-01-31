@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NavigationHeader from '../../components/navigation/NavigationHeader.astro';
+import { TemplateDetails } from '../../components/templates/TemplateDetails';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+---
+
+<BaseLayout title="Template Details">
+  <NavigationHeader currentPath="/templates" slot="nav" />
+  <TemplateDetails templateId={id} client:load />
+</BaseLayout>

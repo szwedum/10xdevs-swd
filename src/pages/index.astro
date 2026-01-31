@@ -1,0 +1,71 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import NavigationHeader from "../components/navigation/NavigationHeader.astro";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "../db/database.types";
+
+export const prerender = false;
+
+const accessToken = Astro.cookies.get("sb-access-token")?.value;
+const refreshToken = Astro.cookies.get("sb-refresh-token")?.value;
+
+if (accessToken && refreshToken) {
+  const supabase = createClient<Database>(import.meta.env.SUPABASE_URL, import.meta.env.SUPABASE_KEY);
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.setSession({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
+
+  if (session && !error) {
+    return Astro.redirect("/templates");
+  }
+
+  Astro.cookies.delete("sb-access-token", { path: "/" });
+  Astro.cookies.delete("sb-refresh-token", { path: "/" });
+}
+---
+
+<BaseLayout title="GymRatPlanner">
+  <NavigationHeader currentPath="/" slot="nav" />
+
+  <section class="container flex flex-col items-center gap-8 py-20 text-center">
+    <p class="rounded-full border px-4 py-1 text-sm font-medium text-primary/80">Plan smarter. Lift stronger.</p>
+    <h1 class="max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">
+      GymRatPlanner keeps every workout organized so you can stay focused on progress.
+    </h1>
+    <p class="max-w-2xl text-lg text-muted-foreground">
+      Build templates, log sets with intelligent prefills, and watch your personal bests climb over time.
+    </p>
+    <div class="flex flex-col gap-3 sm:flex-row">
+      <a
+        href="/signup"
+        class="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow hover:bg-primary/90"
+      >
+        Get started
+      </a>
+      <a
+        href="/login"
+        class="inline-flex items-center justify-center rounded-lg border border-input px-8 py-3 text-base font-semibold text-foreground hover:bg-accent"
+      >
+        Log in
+      </a>
+    </div>
+    <div class="grid gap-6 rounded-2xl border bg-card/50 p-8 shadow-sm sm:grid-cols-3">
+      <div>
+        <p class="text-3xl font-bold">+150</p>
+        <p class="text-sm text-muted-foreground">Exercises logged weekly</p>
+      </div>
+      <div>
+        <p class="text-3xl font-bold">24</p>
+        <p class="text-sm text-muted-foreground">Templates to remix</p>
+      </div>
+      <div>
+        <p class="text-3xl font-bold">∞</p>
+        <p class="text-sm text-muted-foreground">Motivation to stay consistent</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

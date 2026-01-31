@@ -7,10 +7,12 @@ import type { ErrorResponseDTO } from "@/types";
 
 export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
+    setErrorMessage(null);
 
     try {
       const formData = new FormData(event.currentTarget);
@@ -30,8 +32,10 @@ export default function LoginForm() {
 
       window.location.href = "/templates";
     } catch (error) {
-      toast.error("Error", {
-        description: error instanceof Error ? error.message : "Failed to log in",
+      const message = error instanceof Error ? error.message : "Failed to log in";
+      setErrorMessage(message);
+      toast.error("Login failed", {
+        description: message,
       });
     } finally {
       setIsLoading(false);
@@ -40,6 +44,14 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {errorMessage && (
+        <div
+          role="alert"
+          className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+        >
+          {errorMessage}
+        </div>
+      )}
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input

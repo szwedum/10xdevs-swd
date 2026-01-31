@@ -13,7 +13,7 @@ export function TemplateExerciseItem({
     onMoveDown,
 }: TemplateExerciseItemProps) {
     return (
-        <div className="flex flex-col gap-4 rounded-lg border p-4">
+        <div className="flex flex-col gap-4 rounded-lg border p-4" data-test-id={`exercise-item-${exercise.id}`}>
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium">{exercise.exercise_name}</h3>
                 <div className="flex items-center gap-2">
@@ -23,6 +23,7 @@ export function TemplateExerciseItem({
                         onClick={onMoveUp}
                         disabled={!canMoveUp}
                         aria-label="Move exercise up"
+                        data-test-id={`move-up-${exercise.id}`}
                     >
                         <MoveUp className="h-4 w-4" />
                     </Button>
@@ -32,6 +33,7 @@ export function TemplateExerciseItem({
                         onClick={onMoveDown}
                         disabled={!canMoveDown}
                         aria-label="Move exercise down"
+                        data-test-id={`move-down-${exercise.id}`}
                     >
                         <MoveDown className="h-4 w-4" />
                     </Button>
@@ -41,6 +43,7 @@ export function TemplateExerciseItem({
                         onClick={onRemove}
                         className="text-destructive"
                         aria-label="Remove exercise"
+                        data-test-id={`remove-exercise-${exercise.id}`}
                     >
                         <Trash2 className="h-4 w-4" />
                     </Button>
@@ -64,6 +67,7 @@ export function TemplateExerciseItem({
                         }
                         aria-invalid={!!exercise.errors.sets}
                         className={exercise.errors.sets ? "border-destructive" : ""}
+                        data-test-id={`sets-input-${exercise.id}`}
                     />
                     {exercise.errors.sets && (
                         <p
@@ -91,6 +95,7 @@ export function TemplateExerciseItem({
                         }
                         aria-invalid={!!exercise.errors.reps}
                         className={exercise.errors.reps ? "border-destructive" : ""}
+                        data-test-id={`reps-input-${exercise.id}`}
                     />
                     {exercise.errors.reps && (
                         <p
@@ -126,6 +131,7 @@ export function TemplateExerciseItem({
                         }
                         aria-invalid={!!exercise.errors.default_weight}
                         className={exercise.errors.default_weight ? "border-destructive" : ""}
+                        data-test-id={`weight-input-${exercise.id}`}
                     />
                     {exercise.errors.default_weight && (
                         <p

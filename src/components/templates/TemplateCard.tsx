@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { isValidUUID } from "@/lib/utils/validation";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import type { TemplateListItemDTO } from "@/types";
@@ -15,6 +16,13 @@ export function TemplateCard({ template, onDeleted }: TemplateCardProps) {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleStartWorkout = () => {
+    // Validate template ID before navigation using utility function
+    if (!isValidUUID(template.id)) {
+      toast.error("Error", { description: "Invalid template ID. Please try again." });
+      console.error(`Invalid template ID in TemplateCard: ${template.id}`);
+      return;
+    }
+
     window.location.href = `/workout/${template.id}`;
   };
 

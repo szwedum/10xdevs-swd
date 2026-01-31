@@ -42,7 +42,7 @@ export function ExerciseSelector({
     }, [exercises.length, availableExercises.length, loading, error, open]);
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-2" data-test-id="exercise-selector-container">
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                     <Button
@@ -52,6 +52,7 @@ export function ExerciseSelector({
                         aria-expanded={open}
                         className="w-full justify-between"
                         disabled={disabled || loading}
+                        data-test-id="select-exercise-button"
                     >
                         <span className="truncate">
                             {loading ? "Loading exercises..." : "Select an exercise"}
@@ -65,6 +66,7 @@ export function ExerciseSelector({
                             placeholder="Search exercises..."
                             value={search}
                             onValueChange={setSearch}
+                            data-test-id="exercise-search-input"
                         />
                         <CommandList>
                             {error ? (
@@ -83,6 +85,7 @@ export function ExerciseSelector({
                                                 setOpen(false);
                                                 setSearch("");
                                             }}
+                                            data-test-id={`exercise-item-${exercise.id}`}
                                         >
                                             <Check
                                                 className={cn(

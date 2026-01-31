@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { isValidUUID } from "@/lib/utils/validation";
 import { Button } from "@/components/ui/button";
 import type { TemplateDetailDTO } from "@/types";
 import { ExerciseList } from "./ExerciseList";
@@ -39,6 +40,13 @@ export function TemplateDetails({ templateId }: TemplateDetailsProps) {
   }, [templateId]);
 
   const handleStartWorkout = () => {
+    // Validate template ID before navigation using utility function
+    if (!isValidUUID(templateId)) {
+      toast.error("Error", { description: "Invalid template ID. Please try again." });
+      console.error(`Invalid template ID in TemplateDetails: ${templateId}`);
+      return;
+    }
+
     window.location.href = `/workout/${templateId}`;
   };
 

@@ -1,6 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "../../db/database.types";
+import { validateTemplateId } from "../utils/validation";
 import type {
   CreateWorkoutCommand,
   CreateWorkoutResponseDTO,
@@ -19,9 +20,17 @@ export interface GetWorkoutsOptions {
 export class WorkoutService {
   public static async getPrefillData(
     supabase: SupabaseClient<Database>,
-    templateId: string,
+    templateId: unknown,
     userId: string
   ): Promise<WorkoutPrefillResponseDTO> {
+    // Validate template ID using utility function
+    try {
+      validateTemplateId(templateId);
+    } catch (error) {
+      // Re-throw with more context for debugging
+      console.error(`Template ID validation failed in getPrefillData: ${templateId}`);
+      throw error;
+    }
     // Get template with exercises
     const { data: template, error: templateError } = await supabase
       .from("templates")

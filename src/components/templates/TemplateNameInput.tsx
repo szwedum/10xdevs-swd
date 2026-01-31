@@ -10,7 +10,7 @@ export function TemplateNameInput({
     autoFocus = false,
 }: TemplateNameInputProps) {
     return (
-        <div className="space-y-2">
+        <div className="space-y-2" data-test-id="template-name-container">
             <Label htmlFor="template-name">
                 Template Name <span className="text-destructive">*</span>
             </Label>
@@ -25,6 +25,7 @@ export function TemplateNameInput({
                 aria-describedby={error ? "template-name-error" : undefined}
                 aria-invalid={!!error}
                 className={error ? "border-destructive" : ""}
+                data-test-id="template-name-input"
             />
             {error && (
                 <p

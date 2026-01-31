@@ -155,6 +155,7 @@ function CreateTemplateFormInner() {
 
     return (
         <form
+            data-test-id="create-template-form"
             onSubmit={(e) => {
                 console.log('Form onSubmit event triggered');
                 e.preventDefault();

@@ -70,7 +70,7 @@ export const POST: APIRoute = async ({ request, cookies }): Promise<Response> =>
         if (err instanceof z.ZodError) {
             return new Response(JSON.stringify({
                 error: 'Validation Error',
-                message: err.errors[0].message,
+                message: err.issues[0].message,
             } as ErrorResponseDTO), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' },

@@ -29,7 +29,7 @@ export const GET: APIRoute = async ({ url }): Promise<Response> => {
         if (err instanceof z.ZodError) {
             const body: ValidationErrorResponseDTO = {
                 error: 'Validation Error',
-                details: err.errors.map((e) => ({
+                details: err.issues.map((e) => ({
                     field: e.path.join('.'),
                     message: e.message,
                 })),

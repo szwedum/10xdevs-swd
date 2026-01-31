@@ -1,12 +1,10 @@
 ---
-import AuthLayout from '../layouts/AuthLayout.astro';
-import LoginForm from '../components/auth/LoginForm';
+import AuthLayout from "../layouts/AuthLayout.astro";
+import LoginForm from "../components/auth/LoginForm";
 ---
 
 <AuthLayout title="Login">
-  <p slot="header" class="text-sm text-muted-foreground">
-    Enter your email and password to log in to your account
-  </p>
+  <p slot="header" class="text-sm text-muted-foreground">Enter your email and password to log in to your account</p>
 
   <LoginForm client:load />
 

@@ -1,5 +1,5 @@
 ---
-import '../styles/globals.css';
+import "../styles/globals.css";
 
 interface Props {
   title: string;
@@ -9,7 +9,7 @@ interface Props {
 const { title, description } = Astro.props;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="h-full">
   <head>
     <meta charset="UTF-8" />
@@ -21,7 +21,7 @@ const { title, description } = Astro.props;
   <body class="h-full bg-background text-foreground antialiased">
     <div class="flex min-h-full flex-col justify-center">
       <div class="container relative hidden h-screen flex-none p-10 md:block lg:w-1/2">
-        <div class="absolute inset-0 bg-muted" />
+        <div class="absolute inset-0 bg-muted"></div>
       </div>
       <div class="lg:p-8">
         <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">

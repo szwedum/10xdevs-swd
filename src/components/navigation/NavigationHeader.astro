@@ -6,14 +6,16 @@ interface Props {
 const { currentPath } = Astro.props;
 
 const navigation = [
-  { name: 'Templates', href: '/templates' },
-  { name: 'Workouts', href: '/workouts' },
+  { name: "Templates", href: "/templates" },
+  { name: "Workouts", href: "/workouts" },
 ] as const;
 
 const isActive = (path: string) => currentPath === path;
 ---
 
-<header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+<header
+  class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+>
   <div class="container flex h-14 items-center">
     <div class="mr-4 flex">
       <a href="/" class="mr-6 flex items-center space-x-2">
@@ -22,20 +24,22 @@ const isActive = (path: string) => currentPath === path;
     </div>
     <nav class="flex flex-1 items-center justify-between space-x-2 md:justify-end">
       <ul class="flex items-center gap-4">
-        {navigation.map((item) => (
-          <li>
-            <a
-              href={item.href}
-              class:list={[
-                'text-sm font-medium transition-colors hover:text-foreground/80',
-                isActive(item.href) ? 'text-foreground' : 'text-foreground/60',
-              ]}
-              aria-current={isActive(item.href) ? 'page' : undefined}
-            >
-              {item.name}
-            </a>
-          </li>
-        ))}
+        {
+          navigation.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={[
+                  "text-sm font-medium transition-colors hover:text-foreground/80",
+                  isActive(item.href) ? "text-foreground" : "text-foreground/60",
+                ]}
+                aria-current={isActive(item.href) ? "page" : undefined}
+              >
+                {item.name}
+              </a>
+            </li>
+          ))
+        }
       </ul>
       <button
         type="button"
@@ -49,22 +53,22 @@ const isActive = (path: string) => currentPath === path;
 </header>
 
 <script>
-  const logoutButton = document.getElementById('logout-button');
+  const logoutButton = document.getElementById("logout-button");
   if (logoutButton) {
-    logoutButton.addEventListener('click', async () => {
+    logoutButton.addEventListener("click", async () => {
       try {
-        const response = await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/auth/logout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
         });
 
         if (!response.ok) {
-          throw new Error('Failed to log out');
+          throw new Error("Failed to log out");
         }
 
-        window.location.href = '/login';
+        window.location.href = "/login";
       } catch (error) {
-        console.error('Logout failed:', error);
+        console.error("Logout failed:", error);
       }
     });
   }

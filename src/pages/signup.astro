@@ -1,12 +1,10 @@
 ---
-import AuthLayout from '../layouts/AuthLayout.astro';
-import SignUpForm from '../components/auth/SignUpForm';
+import AuthLayout from "../layouts/AuthLayout.astro";
+import SignUpForm from "../components/auth/SignUpForm";
 ---
 
 <AuthLayout title="Sign Up">
-  <p slot="header" class="text-sm text-muted-foreground">
-    Create an account to start tracking your workouts
-  </p>
+  <p slot="header" class="text-sm text-muted-foreground">Create an account to start tracking your workouts</p>
 
   <SignUpForm client:load />
 

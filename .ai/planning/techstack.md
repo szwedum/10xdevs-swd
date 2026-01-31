@@ -13,3 +13,13 @@ Backend - Supabase jako kompleksowe rozwiązanie backendowe:
 
 CI/CD:
 - Github Actions do tworzenia pipeline’ów CI/CD
+
+Testowanie:
+- Vitest do testów jednostkowych i integracyjnych:
+  - Testy jednostkowe dla serwisów i schematów walidacji
+  - Testy integracyjne dla endpointów API i operacji bazodanowych
+  - Raportowanie pokrycia kodu (cel: 70%+ dla logiki biznesowej)
+- Playwright do testów end-to-end:
+  - Testy E2E dla krytycznych ścieżek użytkownika (autentykacja, szablony, treningi)
+  - Automatyczne testowanie UI
+  - Możliwość testowania w różnych przeglądarkach

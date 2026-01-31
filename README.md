@@ -55,6 +55,16 @@ Gym users who follow structured workout routines and want to track their progres
 - **Husky** - Git hooks for pre-commit checks
 - **lint-staged** - Run linters on staged files
 
+### Testing
+- **[Vitest](https://vitest.dev/)** - Fast unit and integration testing framework
+  - Unit tests for services and validation schemas
+  - Integration tests for API endpoints and database operations
+  - Coverage reporting (70%+ target for business logic)
+- **[Playwright](https://playwright.dev/)** - End-to-end testing framework
+  - E2E tests for critical user flows (authentication, templates, workouts)
+  - Cross-browser testing capabilities
+  - Automated UI testing
+
 ## Getting Started Locally
 
 ### Prerequisites
@@ -104,6 +114,11 @@ Gym users who follow structured workout routines and want to track their progres
 | `npm run lint` | Check code for linting errors using ESLint |
 | `npm run lint:fix` | Automatically fix linting errors where possible |
 | `npm run format` | Format code using Prettier |
+| `npm run test` | Run tests in watch mode (Vitest) |
+| `npm run test:unit` | Run unit tests |
+| `npm run test:integration` | Run integration tests |
+| `npm run test:e2e` | Run end-to-end tests (Playwright) |
+| `npm run test:coverage` | Generate test coverage report |
 
 ## Project Scope
 

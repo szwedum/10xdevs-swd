@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import type { ErrorResponseDTO } from "@/types";
 
 export default function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -76,9 +75,7 @@ export default function SignUpForm() {
           </svg>
         </div>
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-green-900 dark:text-green-100">
-            Check your email
-          </h3>
+          <h3 className="text-lg font-semibold text-green-900 dark:text-green-100">Check your email</h3>
           <p className="text-sm text-green-800 dark:text-green-200">
             We've sent a confirmation link to <strong>{userEmail}</strong>
           </p>
@@ -86,11 +83,7 @@ export default function SignUpForm() {
             Please check your inbox and click the confirmation link to activate your account.
           </p>
         </div>
-        <Button
-          variant="outline"
-          className="mt-4"
-          onClick={() => (window.location.href = "/login")}
-        >
+        <Button variant="outline" className="mt-4" onClick={() => (window.location.href = "/login")}>
           Go to Login
         </Button>
       </div>

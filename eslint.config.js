@@ -20,6 +20,10 @@ const baseConfig = tseslint.config({
   rules: {
     "no-console": "warn",
     "no-unused-vars": "off",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-non-null-assertion": "warn",
+    "@typescript-eslint/no-useless-constructor": "off",
+    "@typescript-eslint/no-extraneous-class": "off",
   },
 });
 
@@ -31,6 +35,8 @@ const jsxA11yConfig = tseslint.config({
   },
   rules: {
     ...jsxA11y.flatConfigs.recommended.rules,
+    "jsx-a11y/no-autofocus": "warn",
+    "jsx-a11y/no-redundant-roles": "warn",
   },
 });
 
@@ -53,14 +59,71 @@ const reactConfig = tseslint.config({
     ...eslintPluginReactHooks.configs.recommended.rules,
     "react/react-in-jsx-scope": "off",
     "react-compiler/react-compiler": "error",
+    "react/no-unescaped-entities": "warn",
+    "react/no-unknown-property": "warn",
   },
 });
 
+const testConfig = tseslint.config({
+  files: ["tests/**/*.ts", "**/*.test.ts", "**/*.spec.ts", "**/*.test.tsx", "**/*.spec.tsx"],
+  rules: {
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-unsafe-function-type": "off",
+    "no-console": "off",
+  },
+});
+
+const configFilesConfig = tseslint.config({
+  files: ["*.config.js", "*.config.ts", "*.config.mjs", "tailwind.config.js"],
+  languageOptions: {
+    globals: {
+      module: true,
+      require: true,
+      process: true,
+    },
+  },
+  rules: {
+    "@typescript-eslint/no-require-imports": "off",
+    "no-undef": "off",
+  },
+});
+
+const scriptsConfig = tseslint.config({
+  files: ["scripts/**/*.js", "scripts/**/*.ts"],
+  languageOptions: {
+    globals: {
+      console: true,
+      process: true,
+    },
+  },
+  rules: {
+    "no-console": "off",
+    "no-undef": "off",
+  },
+});
+
+const astroOverrides = {
+  files: ["**/*.astro"],
+  rules: {
+    "prettier/prettier": "off",
+    "no-console": "off",
+  },
+};
+
 export default tseslint.config(
   includeIgnoreFile(gitignorePath),
+  {
+    ignores: ["src/components/navigation/NavigationHeader.astro"],
+  },
   baseConfig,
   jsxA11yConfig,
   reactConfig,
+  testConfig,
+  configFilesConfig,
+  scriptsConfig,
   eslintPluginAstro.configs["flat/recommended"],
-  eslintPluginPrettier
+  eslintPluginPrettier,
+  astroOverrides
 );

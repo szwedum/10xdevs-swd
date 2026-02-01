@@ -1,107 +1,112 @@
-import type { Page } from '@playwright/test';
-import { BasePage } from '../BasePage';
+import type { Page } from "@playwright/test";
+import { BasePage } from "../BasePage";
 
 /**
  * Page Object Model for the Template Exercise List component
  */
 export class TemplateExerciseListPOM extends BasePage {
-    private readonly listTestId = 'template-exercise-list';
-    private readonly emptyListTestId = 'empty-exercise-list';
+  private readonly listTestId = "template-exercise-list";
+  private readonly emptyListTestId = "empty-exercise-list";
 
-    constructor(page: Page) {
-        super(page);
+  constructor(page: Page) {
+    super(page);
+  }
+
+  /**
+   * Check if the exercise list is empty
+   */
+  async isEmpty(): Promise<boolean> {
+    const emptyList = this.getByTestId(this.emptyListTestId);
+    return await emptyList.isVisible();
+  }
+
+  /**
+   * Get the number of exercises in the list
+   */
+  async getExerciseCount(): Promise<number> {
+    // If the list is empty, return 0
+    if (await this.isEmpty()) {
+      return 0;
     }
 
-    /**
-     * Check if the exercise list is empty
-     */
-    async isEmpty(): Promise<boolean> {
-        const emptyList = this.getByTestId(this.emptyListTestId);
-        return await emptyList.isVisible();
+    const exerciseItems = this.page.locator('[data-test-id^="exercise-item-"]');
+    return await exerciseItems.count();
+  }
+
+  /**
+   * Get the ID of the last added exercise
+   */
+  async getLastAddedExerciseId(): Promise<string | null> {
+    const exerciseItems = this.page.locator('[data-test-id^="exercise-item-"]');
+    const count = await exerciseItems.count();
+
+    if (count === 0) {
+      return null;
     }
 
-    /**
-     * Get the number of exercises in the list
-     */
-    async getExerciseCount(): Promise<number> {
-        // If the list is empty, return 0
-        if (await this.isEmpty()) {
-            return 0;
-        }
+    const lastItem = exerciseItems.nth(count - 1);
+    const testId = await lastItem.getAttribute("data-test-id");
 
-        const exerciseItems = this.page.locator('[data-test-id^="exercise-item-"]');
-        return await exerciseItems.count();
+    if (!testId) {
+      return null;
     }
 
-    /**
-     * Get the ID of the last added exercise
-     */
-    async getLastAddedExerciseId(): Promise<string | null> {
-        const exerciseItems = this.page.locator('[data-test-id^="exercise-item-"]');
-        const count = await exerciseItems.count();
+    // Extract the ID from the data-test-id attribute (format: "exercise-item-{id}")
+    return testId.replace("exercise-item-", "");
+  }
 
-        if (count === 0) {
-            return null;
-        }
+  /**
+   * Configure an exercise in the list by setting sets, reps, and weight
+   */
+  async configureExercise(exerciseId: string, sets: number, reps: number, weight: number): Promise<void> {
+    // Wait for the exercise item to be visible
+    const exerciseItem = this.getByTestId(`exercise-item-${exerciseId}`);
+    await exerciseItem.waitFor({ state: "visible", timeout: 5000 });
 
-        const lastItem = exerciseItems.nth(count - 1);
-        const testId = await lastItem.getAttribute('data-test-id');
+    // Fill in sets
+    const setsInput = this.getByTestId(`sets-input-${exerciseId}`);
+    await setsInput.waitFor({ state: "visible", timeout: 5000 });
+    await setsInput.fill(sets.toString());
 
-        if (!testId) {
-            return null;
-        }
+    // Fill in reps
+    const repsInput = this.getByTestId(`reps-input-${exerciseId}`);
+    await repsInput.fill(reps.toString());
 
-        // Extract the ID from the data-test-id attribute (format: "exercise-item-{id}")
-        return testId.replace('exercise-item-', '');
-    }
+    // Fill in weight
+    const weightInput = this.getByTestId(`weight-input-${exerciseId}`);
+    await weightInput.fill(weight.toString());
+  }
 
-    /**
-     * Configure an exercise in the list by setting sets, reps, and weight
-     */
-    async configureExercise(exerciseId: string, sets: number, reps: number, weight: number): Promise<void> {
-        // Fill in sets
-        const setsInput = this.getByTestId(`sets-input-${exerciseId}`);
-        await setsInput.fill(sets.toString());
+  /**
+   * Remove an exercise from the list
+   */
+  async removeExercise(exerciseId: string): Promise<void> {
+    const removeButton = this.getByTestId(`remove-exercise-${exerciseId}`);
+    await removeButton.click();
+  }
 
-        // Fill in reps
-        const repsInput = this.getByTestId(`reps-input-${exerciseId}`);
-        await repsInput.fill(reps.toString());
+  /**
+   * Move an exercise up in the list
+   */
+  async moveExerciseUp(exerciseId: string): Promise<void> {
+    const moveUpButton = this.getByTestId(`move-up-${exerciseId}`);
+    await moveUpButton.click();
+  }
 
-        // Fill in weight
-        const weightInput = this.getByTestId(`weight-input-${exerciseId}`);
-        await weightInput.fill(weight.toString());
-    }
+  /**
+   * Move an exercise down in the list
+   */
+  async moveExerciseDown(exerciseId: string): Promise<void> {
+    const moveDownButton = this.getByTestId(`move-down-${exerciseId}`);
+    await moveDownButton.click();
+  }
 
-    /**
-     * Remove an exercise from the list
-     */
-    async removeExercise(exerciseId: string): Promise<void> {
-        const removeButton = this.getByTestId(`remove-exercise-${exerciseId}`);
-        await removeButton.click();
-    }
-
-    /**
-     * Move an exercise up in the list
-     */
-    async moveExerciseUp(exerciseId: string): Promise<void> {
-        const moveUpButton = this.getByTestId(`move-up-${exerciseId}`);
-        await moveUpButton.click();
-    }
-
-    /**
-     * Move an exercise down in the list
-     */
-    async moveExerciseDown(exerciseId: string): Promise<void> {
-        const moveDownButton = this.getByTestId(`move-down-${exerciseId}`);
-        await moveDownButton.click();
-    }
-
-    /**
-     * Get the name of an exercise by its ID
-     */
-    async getExerciseName(exerciseId: string): Promise<string | null> {
-        const exerciseItem = this.getByTestId(`exercise-item-${exerciseId}`);
-        const nameElement = exerciseItem.locator('h3');
-        return await nameElement.textContent();
-    }
+  /**
+   * Get the name of an exercise by its ID
+   */
+  async getExerciseName(exerciseId: string): Promise<string | null> {
+    const exerciseItem = this.getByTestId(`exercise-item-${exerciseId}`);
+    const nameElement = exerciseItem.locator("h3");
+    return await nameElement.textContent();
+  }
 }

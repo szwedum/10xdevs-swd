@@ -1,4 +1,4 @@
-import type { Tables, TablesInsert, TablesUpdate } from "./db/database.types";
+import type { Tables } from "./db/database.types";
 
 // ============================================================================
 // Base Entity Types (Direct mappings from database)

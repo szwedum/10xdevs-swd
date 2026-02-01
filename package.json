@@ -15,7 +15,8 @@
         "test:integration": "vitest run tests/integration",
         "test:e2e": "playwright test",
         "test:coverage": "vitest run --coverage",
-        "test:ui": "vitest --ui"
+        "test:ui": "vitest --ui",
+        "seed:exercises": "node scripts/seed-exercises.js"
     },
     "dependencies": {
         "@astrojs/node": "^9.4.3",
@@ -75,6 +76,7 @@
         "prettier-plugin-astro": "0.14.1",
         "typescript": "^5.9.3",
         "typescript-eslint": "8.28.0",
+        "vite": "^7.3.1",
         "vitest": "^4.0.18"
     },
     "lint-staged": {

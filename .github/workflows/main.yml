@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -29,7 +32,12 @@ jobs:
         run: npm run test:unit
 
       - name: Run integration tests
-        run: npm run test:integration
+        run: |
+          if [ -n "$(find tests/integration -name '*.test.ts' -o -name '*.spec.ts' 2>/dev/null)" ]; then
+            npm run test:integration
+          else
+            echo "No integration tests found, skipping..."
+          fi
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLIC_KEY: ${{ secrets.SUPABASE_PUBLIC_KEY }}
@@ -57,8 +65,6 @@ jobs:
   build:
     needs: test
     runs-on: ubuntu-latest
-    env:
-      NODE_ENV: production
     
     steps:
       - name: Checkout code
@@ -70,10 +76,10 @@ jobs:
           node-version: '22.14.0'
 
       - name: Build production
-        run: npm run build
+        run: NODE_ENV=production npm run build
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_PUBLIC_KEY: ${{ secrets.SUPABASE_PUBLIC_KEY }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v6

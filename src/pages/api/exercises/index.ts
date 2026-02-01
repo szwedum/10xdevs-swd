@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 
-import { supabaseClient } from "../../../db/supabase.client";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import { ExerciseService } from "../../../lib/services/exercise.service";
 import type { ErrorResponseDTO, ValidationErrorResponseDTO } from "../../../types";
 
@@ -14,12 +14,14 @@ export const queryParamsSchema = z.object({
   search: z.string().trim().min(1).optional(),
 });
 
-export const GET: APIRoute = async ({ url }): Promise<Response> => {
+export const GET: APIRoute = async ({ url, cookies, request }): Promise<Response> => {
   try {
     // Validate and parse query parameters
     const params = queryParamsSchema.parse(Object.fromEntries(url.searchParams));
 
-    const result = await ExerciseService.getExercises(supabaseClient, params);
+    // Use authenticated server client to respect RLS policies
+    const supabase = createSupabaseServerInstance({ cookies, headers: request.headers });
+    const result = await ExerciseService.getExercises(supabase, params);
 
     return new Response(JSON.stringify(result), {
       status: 200,

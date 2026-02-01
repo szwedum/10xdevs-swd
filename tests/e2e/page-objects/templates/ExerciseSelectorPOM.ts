@@ -45,8 +45,13 @@ export class ExerciseSelectorPOM extends BasePage {
       await this.searchExercises(exerciseName.substring(0, 3));
     }
 
-    // Find and click on the exercise item that contains the name
+    // Wait for exercises to load (wait for at least one exercise item to appear)
     const exerciseItems = this.page.locator('[data-test-id^="exercise-item-"]');
+    await exerciseItems.first().waitFor({ state: "visible", timeout: 10000 }).catch(() => {
+      // If no exercises appear, continue anyway to get a better error message
+    });
+
+    // Find and click on the exercise item that contains the name
     const count = await exerciseItems.count();
 
     for (let i = 0; i < count; i++) {

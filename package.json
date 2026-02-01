@@ -15,7 +15,8 @@
         "test:integration": "vitest run tests/integration",
         "test:e2e": "playwright test",
         "test:coverage": "vitest run --coverage",
-        "test:ui": "vitest --ui"
+        "test:ui": "vitest --ui",
+        "seed:exercises": "node scripts/seed-exercises.js"
     },
     "dependencies": {
         "@astrojs/node": "^9.4.3",

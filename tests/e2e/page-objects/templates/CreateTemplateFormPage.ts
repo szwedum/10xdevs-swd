@@ -27,6 +27,7 @@ export class CreateTemplateFormPage extends BasePage {
    */
   async navigateToCreateTemplate(): Promise<void> {
     await this.navigateTo("/templates/new");
+    // Wait for the React component to hydrate and render
     await this.waitForTestId("create-template-form");
   }
 

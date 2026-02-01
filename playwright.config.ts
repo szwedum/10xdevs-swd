@@ -7,6 +7,8 @@ export default defineConfig({
     retries: process.env.CI ? 2 : 0,
     workers: process.env.CI ? 1 : undefined,
     reporter: 'html',
+    globalSetup: './tests/global-setup.ts',
+    globalTeardown: './tests/global-teardown.ts',
     use: {
         baseURL: 'http://localhost:3000',
         trace: 'on-first-retry',
@@ -15,7 +17,10 @@ export default defineConfig({
     projects: [
         {
             name: 'chromium',
-            use: { ...devices['Desktop Chrome'] },
+            use: {
+                ...devices['Desktop Chrome'],
+                storageState: 'tests/.auth/user.json',
+            },
         },
     ],
     webServer: {

@@ -41,10 +41,24 @@ Gym users who follow structured workout routines and want to track their progres
 
 ### Backend
 - **[Supabase](https://supabase.com/)** - Open-source Backend-as-a-Service providing:
-  - PostgreSQL database
-  - Built-in user authentication
+  - PostgreSQL database with Row-Level Security (RLS)
+  - Built-in user authentication with JWT tokens
   - Real-time subscriptions
   - RESTful API
+  - Database migrations and version control
+
+#### Database Architecture
+The application uses a PostgreSQL database with the following schema:
+- **exercises** - Exercise library (bench press, squat, deadlift, etc.)
+- **templates** - User-created workout templates
+- **template_exercises** - Exercises within templates with sets/reps/weight configuration
+- **workouts** - Logged workout sessions
+- **workout_exercises** - Exercises performed in a workout
+- **workout_sets** - Individual sets logged during workouts
+- **personal_bests** - Tracks maximum weight achieved per exercise per user
+- **analytics.event_log** - User activity tracking (partitioned by month)
+
+All tables implement Row-Level Security (RLS) policies to ensure users can only access their own data.
 
 ### CI/CD
 - **GitHub Actions** - Automated testing and deployment pipelines
@@ -86,7 +100,21 @@ Gym users who follow structured workout routines and want to track their progres
    npm install
    ```
 
-3. **Set up environment variables**
+3. **Set up Supabase**
+   
+   a. Create a new project at [supabase.com](https://supabase.com)
+   
+   b. Run the database migrations from the `supabase/migrations` directory:
+      - `20260128141700_initial_schema.sql` - Creates all tables and relationships
+      - `20260128144010_disable_rls_policies.sql` - Initial RLS setup
+      - `20260131163900_enable_rls_policies.sql` - Enables Row-Level Security
+   
+   c. Seed the exercise library (optional but recommended):
+      ```bash
+      npm run seed:exercises
+      ```
+
+4. **Set up environment variables**
    
    Create a `.env` file in the project root with your Supabase credentials:
    ```env
@@ -94,14 +122,14 @@ Gym users who follow structured workout routines and want to track their progres
    PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
-4. **Start the development server**
+5. **Start the development server**
    ```bash
    npm run dev
    ```
 
-5. **Open your browser**
+6. **Open your browser**
    
-   Navigate to `http://localhost:3000` (or the port shown in your terminal)
+   Navigate to `http://localhost:4321` (or the port shown in your terminal)
 
 ## Available Scripts
 
@@ -120,6 +148,61 @@ Gym users who follow structured workout routines and want to track their progres
 | `npm run test:e2e` | Run end-to-end tests (Playwright) |
 | `npm run test:coverage` | Generate test coverage report |
 | `npm run seed:exercises` | Seed the test database with exercise data (required for e2e tests) |
+
+## Project Structure
+
+```
+10xdevs-swd/
+├── src/
+│   ├── components/          # React components
+│   │   ├── auth/           # Authentication components
+│   │   ├── navigation/     # Navigation and layout components
+│   │   ├── templates/      # Template management components
+│   │   ├── workout/        # Workout logging components
+│   │   └── ui/             # Reusable UI components (shadcn/ui)
+│   ├── layouts/            # Astro layout components
+│   ├── lib/
+│   │   ├── services/       # Business logic and API clients
+│   │   ├── hooks/          # React custom hooks
+│   │   └── contexts/       # React context providers
+│   ├── pages/              # Astro pages and API routes
+│   │   ├── api/           # REST API endpoints
+│   │   ├── templates/     # Template pages
+│   │   └── workout/       # Workout pages
+│   └── db/                 # Database client and types
+├── supabase/
+│   └── migrations/         # Database schema migrations
+├── tests/
+│   ├── unit/              # Unit tests (Vitest)
+│   ├── integration/       # Integration tests (Vitest)
+│   └── e2e/               # End-to-end tests (Playwright)
+└── scripts/               # Utility scripts (e.g., database seeding)
+```
+
+## API Endpoints
+
+The application provides a RESTful API built with Astro server endpoints:
+
+### Authentication
+- `POST /api/auth/signup` - Create new user account
+- `POST /api/auth/login` - Authenticate user and return session
+- `POST /api/auth/logout` - End user session
+
+### Exercises
+- `GET /api/exercises` - List all available exercises
+- `GET /api/exercises?search=query` - Search exercises by name
+
+### Templates
+- `GET /api/templates` - Get all templates for authenticated user
+- `POST /api/templates` - Create new workout template
+- `DELETE /api/templates/:id` - Delete a template
+
+### Workouts
+- `GET /api/workouts/:templateId` - Get workout data prefilled from last session
+- `POST /api/workouts` - Log a completed workout
+- `GET /api/workouts/personal-bests` - Get all personal bests for the user
+
+All API endpoints (except auth) require authentication via session cookies. The API returns JSON responses and uses standard HTTP status codes.
 
 ## Testing
 
@@ -172,6 +255,36 @@ If you encounter "Exercise not found" errors during e2e tests, re-run the seed c
 ```bash
 npm run seed:exercises
 ```
+
+## Deployment
+
+The application can be deployed to any platform that supports Node.js applications. The project is configured with:
+
+- **Server-side rendering (SSR)** using Astro with Node.js adapter
+- **Environment variables** for Supabase configuration
+- **Production build** optimized for performance
+
+### Recommended Deployment Platforms
+
+- **[Vercel](https://vercel.com)** - Zero-config deployment for Astro applications
+- **[Netlify](https://netlify.com)** - Supports Astro SSR with Node.js
+- **[Railway](https://railway.app)** - Simple deployment with automatic HTTPS
+- **[Fly.io](https://fly.io)** - Deploy as a Docker container
+
+### Deployment Steps
+
+1. Build the application:
+   ```bash
+   npm run build
+   ```
+
+2. Set environment variables on your hosting platform:
+   - `PUBLIC_SUPABASE_URL`
+   - `PUBLIC_SUPABASE_ANON_KEY`
+
+3. Deploy the `dist/` directory with Node.js runtime
+
+4. Ensure your Supabase project allows connections from your deployment domain
 
 ## Project Scope
 
@@ -229,9 +342,21 @@ npm run seed:exercises
 
 ## Project Status
 
-🚧 **Current Status**: MVP Development Phase
+✅ **Current Status**: MVP Complete
 
-This project is currently in active development as a Minimum Viable Product (MVP). The focus is on delivering core workout tracking functionality with a clean, simple user experience.
+The Minimum Viable Product (MVP) has been successfully implemented with all core features fully functional. The application delivers a complete workout tracking experience with template management, workout logging, and personal best tracking.
+
+### Implemented Features
+
+All MVP features have been completed and tested:
+- ✅ User authentication (signup, login, logout)
+- ✅ Workout template creation and management
+- ✅ Exercise library with search functionality
+- ✅ Workout logging with prefilled data from previous sessions
+- ✅ Personal best tracking and automatic updates
+- ✅ Responsive design for mobile and desktop
+- ✅ Input validation and error handling
+- ✅ Comprehensive test coverage (unit, integration, and E2E tests)
 
 ### Success Metrics
 
@@ -241,9 +366,46 @@ The MVP will be considered successful if:
 - Users log an average of **3+ workouts per week**
 - **30%** of completed workouts result in at least one new personal best
 
+## Contributing
+
+Contributions are welcome! This project follows standard development practices:
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes following the existing code style
+4. Run tests to ensure everything works:
+   ```bash
+   npm run lint
+   npm run test:unit
+   npm run test:integration
+   npm run test:e2e
+   ```
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to your branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+### Code Quality
+
+- All code must pass ESLint and Prettier checks
+- Maintain or improve test coverage
+- Follow TypeScript best practices
+- Write meaningful commit messages
+- Add tests for new features
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details (if available).
+
+---
+
+## Additional Resources
+
+- **[Astro Documentation](https://docs.astro.build/)** - Learn about Astro framework
+- **[Supabase Documentation](https://supabase.com/docs)** - Database and authentication setup
+- **[Tailwind CSS Documentation](https://tailwindcss.com/docs)** - Styling reference
+- **[Playwright Documentation](https://playwright.dev/)** - E2E testing guide
 
 ---
 

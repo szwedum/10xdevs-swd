@@ -32,7 +32,12 @@ jobs:
         run: npm run test:unit
 
       - name: Run integration tests
-        run: npm run test:integration
+        run: |
+          if [ -n "$(find tests/integration -name '*.test.ts' -o -name '*.spec.ts' 2>/dev/null)" ]; then
+            npm run test:integration
+          else
+            echo "No integration tests found, skipping..."
+          fi
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLIC_KEY: ${{ secrets.SUPABASE_PUBLIC_KEY }}

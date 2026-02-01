@@ -3,24 +3,24 @@ import { createClient } from '@supabase/supabase-js';
 
 async function globalTeardown(config: FullConfig) {
     const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_KEY;
+    const supabaseKey = process.env.SUPABASE_PUBLIC_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-        console.warn('SUPABASE_URL and SUPABASE_KEY not set, skipping teardown');
+        console.warn('SUPABASE_URL and SUPABASE_PUBLIC_KEY not set, skipping teardown');
         return;
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const testEmail = process.env.TEST_USER_EMAIL || 'test@example.com';
-    const testPassword = process.env.TEST_USER_PASSWORD || 'testpassword123';
+    const testEmail = process.env.E2E_USERNAME || 'test@example.com';
+    const testPassword = process.env.E2E_PASSWORD || 'testpassword123';
 
     console.log('Tearing down test environment...');
 
     try {
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
-            email: testEmail,
-            password: testPassword,
+            email: process.env.E2E_USERNAME!,
+            password: process.env.E2E_PASSWORD!,
         });
 
         if (signInError) {
@@ -29,12 +29,39 @@ async function globalTeardown(config: FullConfig) {
         }
 
         if (data.user) {
-            const { error: deleteError } = await supabase.auth.admin.deleteUser(data.user.id);
+            // Instead of deleting the user, clean up any test data created during tests
+            // This approach avoids needing admin privileges
+            console.log('Cleaning up test data for user:', data.user.id);
 
-            if (deleteError) {
-                console.warn('Could not delete test user:', deleteError.message);
-            } else {
-                console.log('Test user cleaned up successfully');
+            try {
+                // Delete templates created during tests
+                const { error: templatesError } = await supabase
+                    .from('templates')
+                    .delete()
+                    .eq('user_id', data.user.id);
+
+                if (templatesError) {
+                    console.warn('Error cleaning up templates:', templatesError.message);
+                } else {
+                    console.log('Successfully cleaned up templates');
+                }
+
+                // Delete any exercises created by this user
+                const { error: exercisesError } = await supabase
+                    .from('exercises')
+                    .delete()
+                    .eq('created_by', data.user.id);
+
+                if (exercisesError) {
+                    console.warn('Error cleaning up exercises:', exercisesError.message);
+                } else {
+                    console.log('Successfully cleaned up exercises');
+                }
+
+                // Add more cleanup operations for other tables as needed
+
+            } catch (cleanupError) {
+                console.warn('Error during data cleanup:', cleanupError);
             }
         }
     } catch (error) {

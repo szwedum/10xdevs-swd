@@ -1,4 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config({ path: path.resolve(process.cwd(), '.env.test') });
 
 export default defineConfig({
     testDir: './tests/e2e',
@@ -10,7 +14,7 @@ export default defineConfig({
     globalSetup: './tests/global-setup.ts',
     globalTeardown: './tests/global-teardown.ts',
     use: {
-        baseURL: 'http://localhost:3000',
+        baseURL: 'http://localhost:4321',
         trace: 'on-first-retry',
         screenshot: 'only-on-failure',
     },
@@ -25,7 +29,7 @@ export default defineConfig({
     ],
     webServer: {
         command: 'npm run dev',
-        url: 'http://localhost:3000',
+        url: 'http://localhost:4321',
         reuseExistingServer: !process.env.CI,
         timeout: 120000,
     },

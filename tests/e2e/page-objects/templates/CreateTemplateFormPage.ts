@@ -39,10 +39,12 @@ export class CreateTemplateFormPage extends BasePage {
   }
 
   /**
-   * Select an exercise by name
+   * Select an exercise from the dropdown
    */
   async selectExercise(exerciseName: string): Promise<void> {
     await this.exerciseSelector.selectExercise(exerciseName);
+    // Wait for React to hydrate the new exercise item
+    await this.page.waitForTimeout(500);
   }
 
   /**

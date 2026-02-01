@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 
-import { supabaseClient } from "../../../db/supabase.client";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import { createTemplateSchema } from "../../../lib/validation/template.schema";
 import type { ErrorResponseDTO, ValidationErrorResponseDTO } from "../../../types";
 import { TemplateService } from "../../../lib/services/template.service";
@@ -21,7 +21,7 @@ export const queryParamsSchema = z.object({
 // ---------------------------------------------------------------------------
 // GET /api/templates handler (Step 3 of implementation plan)
 // ---------------------------------------------------------------------------
-export const POST: APIRoute = async ({ request, locals }): Promise<Response> => {
+export const POST: APIRoute = async ({ request, locals, cookies }): Promise<Response> => {
   const userId = locals.user?.id;
   if (!userId) {
     return new Response(
@@ -37,7 +37,8 @@ export const POST: APIRoute = async ({ request, locals }): Promise<Response> => 
     const body = await request.json();
     const validatedBody = createTemplateSchema.parse(body);
 
-    const result = await TemplateService.createTemplate(supabaseClient, userId, validatedBody);
+    const supabase = createSupabaseServerInstance({ cookies, headers: request.headers });
+    const result = await TemplateService.createTemplate(supabase, userId, validatedBody);
 
     return new Response(JSON.stringify(result), {
       status: 201,
@@ -75,9 +76,9 @@ export const POST: APIRoute = async ({ request, locals }): Promise<Response> => 
       "Error creating template:",
       err instanceof Error
         ? {
-            message: err.message,
-            stack: err.stack,
-          }
+          message: err.message,
+          stack: err.stack,
+        }
         : err
     );
     const body: ErrorResponseDTO = {
@@ -91,7 +92,7 @@ export const POST: APIRoute = async ({ request, locals }): Promise<Response> => 
   }
 };
 
-export const GET: APIRoute = async ({ url, locals }): Promise<Response> => {
+export const GET: APIRoute = async ({ url, locals, cookies, request }): Promise<Response> => {
   const userId = locals.user?.id;
   if (!userId) {
     return new Response(
@@ -140,7 +141,8 @@ export const GET: APIRoute = async ({ url, locals }): Promise<Response> => {
       userId,
       params,
     });
-    const result = await TemplateService.getTemplates(supabaseClient, userId, params);
+    const supabase = createSupabaseServerInstance({ cookies, headers: request.headers });
+    const result = await TemplateService.getTemplates(supabase, userId, params);
     console.log("Service returned result:", result);
     return new Response(JSON.stringify(result), {
       status: 200,

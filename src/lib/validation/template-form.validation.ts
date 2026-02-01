@@ -4,6 +4,9 @@ export const validateTemplateName = (name: string): string | undefined => {
   if (!name.trim()) {
     return "Template name is required";
   }
+  if (name.trim().length < 3) {
+    return "Template name must be at least 3 characters";
+  }
   if (name.length > 60) {
     return "Maximum 60 characters allowed";
   }

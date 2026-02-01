@@ -44,109 +44,31 @@ export function useCreateTemplate(): UseCreateTemplateResult {
           }
         });
     }
-  }, []); // Run only once on mount
+  }, [supabase, config?.accessToken, config?.refreshToken]); // Re-run when dependencies change
 
   const createTemplate = async (data: CreateTemplateCommand): Promise<TemplateDetailDTO> => {
-    if (!supabase) {
-      throw new Error("Supabase client not initialized");
-    }
-
     setIsLoading(true);
     setError(null);
 
     try {
-      // Ensure session is set before proceeding
-      let userId: string;
-      if (config?.accessToken && config?.refreshToken) {
-        console.log("createTemplate - ensuring session is set");
-        const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-          access_token: config.accessToken,
-          refresh_token: config.refreshToken,
-        });
-        console.log("createTemplate - setSession response:", {
-          session: sessionData.session?.user?.id,
-          error: sessionError,
-        });
-        if (sessionError) {
-          console.error("createTemplate - session error:", sessionError);
-          throw new Error(`Session error: ${sessionError.message}`);
-        }
-        if (!sessionData.session?.user?.id) {
-          throw new Error("Session not created - tokens may be invalid");
-        }
-        userId = sessionData.session.user.id;
-        console.log("createTemplate - using userId from session:", userId);
-      } else {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        console.log("createTemplate - user from getUser:", user?.id);
-        if (!user?.id) throw new Error("User not authenticated");
-        userId = user.id;
+      // Call the API endpoint instead of using browser Supabase client
+      // This uses server-side authentication which properly handles RLS
+      const response = await fetch('/api/templates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+        credentials: 'include', // Include cookies for authentication
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create template');
       }
 
-      // Create template
-      const { data: template, error: templateError } = await supabase
-        .from("templates")
-        .insert({
-          name: data.name,
-          user_id: userId,
-        })
-        .select()
-        .single();
-
-      if (templateError) throw templateError;
-
-      // Create template exercises
-      const { error: exercisesError } = await supabase.from("template_exercises").insert(
-        data.exercises.map((exercise) => ({
-          template_id: template.id,
-          exercise_id: exercise.exercise_id,
-          sets: exercise.sets,
-          reps: exercise.reps,
-          default_weight: exercise.default_weight,
-          position: exercise.position,
-        }))
-      );
-
-      if (exercisesError) throw exercisesError;
-
-      // Fetch complete template with exercises
-      const { data: templateDetail, error: detailError } = await supabase
-        .from("templates")
-        .select(
-          `
-          *,
-          template_exercises (
-            *,
-            exercises (*)
-          )
-        `
-        )
-        .eq("id", template.id)
-        .single();
-
-      if (detailError) throw detailError;
-
-      // Transform to match TemplateDetailDTO structure
-      const response: TemplateDetailDTO = {
-        id: templateDetail.id,
-        user_id: templateDetail.user_id,
-        name: templateDetail.name,
-        created_at: templateDetail.created_at,
-        exercises: templateDetail.template_exercises.map((te: any) => ({
-          id: te.id,
-          template_id: te.template_id,
-          exercise_id: te.exercise_id,
-          exercise_name: te.exercises.name,
-          sets: te.sets,
-          reps: te.reps,
-          default_weight: te.default_weight,
-          position: te.position,
-        })),
-      };
-
-      return response;
+      const result: TemplateDetailDTO = await response.json();
+      return result;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to create template";
       setError(message);

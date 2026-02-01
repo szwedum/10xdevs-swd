@@ -59,8 +59,13 @@ export class TemplateExerciseListPOM extends BasePage {
    * Configure an exercise in the list by setting sets, reps, and weight
    */
   async configureExercise(exerciseId: string, sets: number, reps: number, weight: number): Promise<void> {
+    // Wait for the exercise item to be visible
+    const exerciseItem = this.getByTestId(`exercise-item-${exerciseId}`);
+    await exerciseItem.waitFor({ state: "visible", timeout: 5000 });
+
     // Fill in sets
     const setsInput = this.getByTestId(`sets-input-${exerciseId}`);
+    await setsInput.waitFor({ state: "visible", timeout: 5000 });
     await setsInput.fill(sets.toString());
 
     // Fill in reps

@@ -57,6 +57,81 @@ async function globalSetup(config: FullConfig) {
 
   console.log("Successfully authenticated with Supabase");
 
+  // Seed exercises for tests using authenticated client
+  console.log("Seeding exercises...");
+  const SEED_EXERCISES = [
+    { name: "Bench Press", created_by: authData.user.id },
+    { name: "Incline Bench Press", created_by: authData.user.id },
+    { name: "Decline Bench Press", created_by: authData.user.id },
+    { name: "Overhead Press", created_by: authData.user.id },
+    { name: "Dumbbell Press", created_by: authData.user.id },
+    { name: "Dumbbell Incline Press", created_by: authData.user.id },
+    { name: "Push-ups", created_by: authData.user.id },
+    { name: "Dips", created_by: authData.user.id },
+    { name: "Lateral Raises", created_by: authData.user.id },
+    { name: "Front Raises", created_by: authData.user.id },
+    { name: "Tricep Extensions", created_by: authData.user.id },
+    { name: "Tricep Pushdowns", created_by: authData.user.id },
+    { name: "Deadlift", created_by: authData.user.id },
+    { name: "Barbell Row", created_by: authData.user.id },
+    { name: "Dumbbell Row", created_by: authData.user.id },
+    { name: "Pull-ups", created_by: authData.user.id },
+    { name: "Chin-ups", created_by: authData.user.id },
+    { name: "Lat Pulldowns", created_by: authData.user.id },
+    { name: "Face Pulls", created_by: authData.user.id },
+    { name: "Hammer Curls", created_by: authData.user.id },
+    { name: "Bicep Curls", created_by: authData.user.id },
+    { name: "Preacher Curls", created_by: authData.user.id },
+    { name: "Squat", created_by: authData.user.id },
+    { name: "Front Squat", created_by: authData.user.id },
+    { name: "Romanian Deadlift", created_by: authData.user.id },
+    { name: "Leg Press", created_by: authData.user.id },
+    { name: "Bulgarian Split Squats", created_by: authData.user.id },
+    { name: "Lunges", created_by: authData.user.id },
+    { name: "Calf Raises", created_by: authData.user.id },
+    { name: "Leg Extensions", created_by: authData.user.id },
+    { name: "Leg Curls", created_by: authData.user.id },
+    { name: "Hip Thrusts", created_by: authData.user.id },
+    { name: "Planks", created_by: authData.user.id },
+    { name: "Russian Twists", created_by: authData.user.id },
+    { name: "Ab Rollouts", created_by: authData.user.id },
+    { name: "Hanging Leg Raises", created_by: authData.user.id },
+    { name: "Cable Crunches", created_by: authData.user.id },
+    { name: "Wood Choppers", created_by: authData.user.id },
+    { name: "Clean and Jerk", created_by: authData.user.id },
+    { name: "Power Clean", created_by: authData.user.id },
+    { name: "Snatch", created_by: authData.user.id },
+    { name: "Power Snatch", created_by: authData.user.id },
+    { name: "Kettlebell Swings", created_by: authData.user.id },
+    { name: "Battle Ropes", created_by: authData.user.id },
+    { name: "Box Jumps", created_by: authData.user.id },
+    { name: "Burpees", created_by: authData.user.id },
+  ];
+
+  // Create authenticated Supabase client
+  const authenticatedSupabase = createClient(supabaseUrl, supabaseKey, {
+    global: {
+      headers: {
+        Authorization: `Bearer ${authData.session.access_token}`,
+      },
+    },
+  });
+
+  const { data: existingExercises } = await authenticatedSupabase.from("exercises").select("name");
+  const existingNames = new Set(existingExercises?.map((e) => e.name) || []);
+  const newExercises = SEED_EXERCISES.filter((e) => !existingNames.has(e.name));
+
+  if (newExercises.length > 0) {
+    const { error: seedError } = await authenticatedSupabase.from("exercises").insert(newExercises);
+    if (seedError) {
+      console.error("Failed to seed exercises:", seedError);
+    } else {
+      console.log(`Seeded ${newExercises.length} exercises`);
+    }
+  } else {
+    console.log("All exercises already exist");
+  }
+
   // Create browser and perform actual login to get proper cookies
   const baseURL = config.projects[0].use?.baseURL || "http://localhost:4321";
   const browser = await chromium.launch();

@@ -9,8 +9,15 @@ test.describe("Template Creation Flow", () => {
     const exercises = [
       { name: "Bench Press", sets: 4, reps: 8, weight: 60 },
       { name: "Squat", sets: 5, reps: 5, weight: 100 },
-      { name: "Pull-up", sets: 3, reps: 12, weight: 0 },
+      { name: "Pull-ups", sets: 3, reps: 12, weight: 0 },
     ];
+
+    // Capture console errors
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        console.log('Browser error:', msg.text());
+      }
+    });
 
     // Act
     await templatePage.navigateToCreateTemplate();

@@ -65,8 +65,6 @@ jobs:
   build:
     needs: test
     runs-on: ubuntu-latest
-    env:
-      NODE_ENV: production
     
     steps:
       - name: Checkout code
@@ -78,7 +76,7 @@ jobs:
           node-version: '22.14.0'
 
       - name: Build production
-        run: npm run build
+        run: NODE_ENV=production npm run build
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}

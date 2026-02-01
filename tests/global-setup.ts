@@ -168,22 +168,34 @@ async function globalSetup(config: FullConfig) {
 
   // Wait for the form to be ready (React component needs to hydrate)
   await page.waitForSelector('input[name="email"]', { state: "visible" });
-  await page.waitForTimeout(1000); // Give React time to hydrate
+  await page.waitForSelector('button[type="submit"]:not([disabled])', { state: "visible" });
+
+  // Wait for React to hydrate - check if the form is interactive
+  await page.waitForTimeout(2000);
 
   // Fill in login form
   await page.fill('input[name="email"]', process.env.E2E_USERNAME!);
   await page.fill('input[name="password"]', process.env.E2E_PASSWORD!);
 
   // Submit the form and wait for the API call and navigation
+  // Use Promise.race to handle both success and error responses
   const [response] = await Promise.all([
-    page.waitForResponse((response) => response.url().includes("/api/auth/login") && response.status() === 200),
+    page.waitForResponse(
+      (response) => response.url().includes("/api/auth/login"),
+      { timeout: 30000 }
+    ),
     page.click('button[type="submit"]'),
   ]);
 
   console.log("Login API response:", response.status());
 
+  if (response.status() !== 200) {
+    const body = await response.text();
+    throw new Error(`Login failed with status ${response.status()}: ${body}`);
+  }
+
   // Wait for the redirect to complete
-  await page.waitForURL(`${baseURL}/templates`, { timeout: 5000 });
+  await page.waitForURL(`${baseURL}/templates`, { timeout: 10000 });
 
   console.log("Login completed, current URL:", page.url());
 

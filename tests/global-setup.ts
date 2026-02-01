@@ -180,10 +180,7 @@ async function globalSetup(config: FullConfig) {
   // Submit the form and wait for the API call and navigation
   // Use Promise.race to handle both success and error responses
   const [response] = await Promise.all([
-    page.waitForResponse(
-      (response) => response.url().includes("/api/auth/login"),
-      { timeout: 30000 }
-    ),
+    page.waitForResponse((response) => response.url().includes("/api/auth/login"), { timeout: 30000 }),
     page.click('button[type="submit"]'),
   ]);
 

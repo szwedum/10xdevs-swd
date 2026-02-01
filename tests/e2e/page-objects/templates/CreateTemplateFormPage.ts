@@ -26,7 +26,7 @@ export class CreateTemplateFormPage extends BasePage {
    * Navigate to the create template page
    */
   async navigateToCreateTemplate(): Promise<void> {
-    await this.navigateTo("/templates/create");
+    await this.navigateTo("/templates/new");
     await this.waitForTestId("create-template-form");
   }
 

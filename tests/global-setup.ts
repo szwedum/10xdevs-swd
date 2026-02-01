@@ -87,42 +87,6 @@ async function globalSetup(config: FullConfig) {
 
   console.log("Login completed, current URL:", page.url());
 
-  // Seed exercises for tests using Supabase client
-  console.log("Seeding exercises...");
-  const SEED_EXERCISES = [
-    { name: "Bench Press" }, { name: "Incline Bench Press" }, { name: "Decline Bench Press" },
-    { name: "Overhead Press" }, { name: "Dumbbell Press" }, { name: "Dumbbell Incline Press" },
-    { name: "Push-ups" }, { name: "Dips" }, { name: "Lateral Raises" }, { name: "Front Raises" },
-    { name: "Tricep Extensions" }, { name: "Tricep Pushdowns" }, { name: "Deadlift" },
-    { name: "Barbell Row" }, { name: "Dumbbell Row" }, { name: "Pull-ups" }, { name: "Chin-ups" },
-    { name: "Lat Pulldowns" }, { name: "Face Pulls" }, { name: "Hammer Curls" },
-    { name: "Bicep Curls" }, { name: "Preacher Curls" }, { name: "Squat" }, { name: "Front Squat" },
-    { name: "Romanian Deadlift" }, { name: "Leg Press" }, { name: "Bulgarian Split Squats" },
-    { name: "Lunges" }, { name: "Calf Raises" }, { name: "Leg Extensions" }, { name: "Leg Curls" },
-    { name: "Hip Thrusts" }, { name: "Planks" }, { name: "Russian Twists" }, { name: "Ab Rollouts" },
-    { name: "Hanging Leg Raises" }, { name: "Cable Crunches" }, { name: "Wood Choppers" },
-    { name: "Clean and Jerk" }, { name: "Power Clean" }, { name: "Snatch" }, { name: "Power Snatch" },
-    { name: "Kettlebell Swings" }, { name: "Battle Ropes" }, { name: "Box Jumps" }, { name: "Burpees" },
-  ];
-
-  const { data: existing } = await supabase.from("exercises").select("name");
-  const existingNames = new Set(existing?.map((e) => e.name) || []);
-  const newExercises = SEED_EXERCISES.filter((e) => !existingNames.has(e.name)).map((e) => ({
-    ...e,
-    created_by: authData.user.id,
-  }));
-
-  if (newExercises.length > 0) {
-    const { error: seedError } = await supabase.from("exercises").insert(newExercises);
-    if (seedError) {
-      console.warn("Failed to seed exercises:", seedError.message);
-    } else {
-      console.log(`Successfully seeded ${newExercises.length} exercises`);
-    }
-  } else {
-    console.log("All exercises already exist");
-  }
-
   // Save the storage state for tests (includes cookies set by the login endpoint)
   await context.storageState({ path: "tests/.auth/user.json" });
   await browser.close();

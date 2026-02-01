@@ -119,6 +119,59 @@ Gym users who follow structured workout routines and want to track their progres
 | `npm run test:integration` | Run integration tests |
 | `npm run test:e2e` | Run end-to-end tests (Playwright) |
 | `npm run test:coverage` | Generate test coverage report |
+| `npm run seed:exercises` | Seed the test database with exercise data (required for e2e tests) |
+
+## Testing
+
+### Running Tests
+
+The project includes comprehensive testing at multiple levels:
+
+- **Unit Tests**: Test individual functions and components in isolation
+- **Integration Tests**: Test API endpoints and database operations
+- **E2E Tests**: Test complete user flows in a real browser environment
+
+### E2E Test Setup
+
+**Important**: Before running e2e tests for the first time, you need to seed the test database with exercise data.
+
+1. **Create a `.env.test` file** in the project root with your test environment credentials:
+   ```env
+   SUPABASE_URL=your_test_supabase_url
+   SUPABASE_KEY=your_test_supabase_anon_key
+   E2E_USERNAME=test@example.com
+   E2E_PASSWORD=your_test_password
+   ```
+
+2. **Seed the exercise database** (one-time setup):
+   ```bash
+   npm run seed:exercises
+   ```
+   
+   This command will:
+   - Authenticate with your test Supabase instance
+   - Insert 46 predefined exercises (Bench Press, Squat, Deadlift, etc.)
+   - Skip exercises that already exist (safe to run multiple times)
+   
+   **Note**: The exercises are associated with the test user account and will be cleaned up after each test run by the global teardown. You'll need to re-run this command if the test database is reset or after running the full e2e test suite.
+
+3. **Run the e2e tests**:
+   ```bash
+   npm run test:e2e
+   ```
+
+### Test Database Management
+
+The e2e tests use a separate test database to avoid affecting your development data:
+
+- **Global Setup**: Creates/authenticates the test user and performs browser login
+- **Global Teardown**: Cleans up test data (templates and exercises) after all tests complete
+- **Exercise Seeding**: Must be done manually before running tests (see above)
+
+If you encounter "Exercise not found" errors during e2e tests, re-run the seed command:
+```bash
+npm run seed:exercises
+```
 
 ## Project Scope
 

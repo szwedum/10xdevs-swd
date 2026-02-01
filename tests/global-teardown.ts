@@ -43,14 +43,8 @@ async function globalTeardown(config: FullConfig) {
           console.log("Successfully cleaned up templates");
         }
 
-        // Delete any exercises created by this user
-        const { error: exercisesError } = await supabase.from("exercises").delete().eq("created_by", data.user.id);
-
-        if (exercisesError) {
-          console.warn("Error cleaning up exercises:", exercisesError.message);
-        } else {
-          console.log("Successfully cleaned up exercises");
-        }
+        // Note: We do NOT delete exercises as they are seed data that should persist across test runs
+        // Deleting them would cause FK constraint violations in subsequent test runs
 
         // Add more cleanup operations for other tables as needed
       } catch (cleanupError) {

@@ -132,8 +132,33 @@ async function globalSetup(config: FullConfig) {
     console.log("All exercises already exist");
   }
 
-  // Create browser and perform actual login to get proper cookies
+  // Wait for the dev server to be ready
   const baseURL = config.projects[0].use?.baseURL || "http://localhost:4321";
+  console.log("Waiting for dev server to be ready...");
+
+  // Poll the server until it's ready (max 60 seconds)
+  const maxWaitTime = 60000;
+  const startTime = Date.now();
+  let serverReady = false;
+
+  while (!serverReady && Date.now() - startTime < maxWaitTime) {
+    try {
+      const response = await fetch(baseURL);
+      if (response.ok || response.status === 404) {
+        serverReady = true;
+        console.log("Dev server is ready");
+      }
+    } catch (error) {
+      // Server not ready yet, wait and retry
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+
+  if (!serverReady) {
+    throw new Error("Dev server did not start in time");
+  }
+
+  // Create browser and perform actual login to get proper cookies
   const browser = await chromium.launch();
   const context = await browser.newContext({ baseURL });
   const page = await context.newPage();

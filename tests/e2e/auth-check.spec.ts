@@ -15,7 +15,7 @@ test.describe("Authentication and Database Access", () => {
 
     // Create a server-side Supabase client to test database access
     const supabaseUrl = process.env.SUPABASE_URL!;
-    const supabaseKey = process.env.SUPABASE_PUBLIC_KEY!;
+    const supabaseKey = process.env.SUPABASE_KEY!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // First authenticate with Supabase

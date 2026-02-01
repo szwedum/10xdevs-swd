@@ -3,10 +3,10 @@ import { createClient } from "@supabase/supabase-js";
 
 async function globalSetup(config: FullConfig) {
   const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_PUBLIC_KEY;
+  const supabaseKey = process.env.SUPABASE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error("SUPABASE_URL and SUPABASE_PUBLIC_KEY must be set in environment variables");
+    throw new Error("SUPABASE_URL and SUPABASE_KEY must be set in environment variables");
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey);

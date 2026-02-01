@@ -3,10 +3,10 @@ import { createClient } from "@supabase/supabase-js";
 
 async function globalTeardown(config: FullConfig) {
   const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_PUBLIC_KEY;
+  const supabaseKey = process.env.SUPABASE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    console.warn("SUPABASE_URL and SUPABASE_PUBLIC_KEY not set, skipping teardown");
+    console.warn("SUPABASE_URL and SUPABASE_KEY not set, skipping teardown");
     return;
   }
 

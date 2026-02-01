@@ -75,9 +75,9 @@ export const POST: APIRoute = async ({ request, locals }): Promise<Response> => 
       "Error creating template:",
       err instanceof Error
         ? {
-          message: err.message,
-          stack: err.stack,
-        }
+            message: err.message,
+            stack: err.stack,
+          }
         : err
     );
     const body: ErrorResponseDTO = {

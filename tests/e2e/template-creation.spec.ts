@@ -13,9 +13,9 @@ test.describe("Template Creation Flow", () => {
     ];
 
     // Capture console errors
-    page.on('console', msg => {
-      if (msg.type() === 'error') {
-        console.log('Browser error:', msg.text());
+    page.on("console", (msg) => {
+      if (msg.type() === "error") {
+        console.log("Browser error:", msg.text());
       }
     });
 

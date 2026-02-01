@@ -48,10 +48,10 @@ export class ExerciseSelectorPOM extends BasePage {
 
     // Use Playwright's getByRole to find the exact button by accessible name
     // The buttons in the exercise list should have the exercise name as text content
-    const exerciseButton = this.page.getByRole('button', { name: exerciseName, exact: true });
+    const exerciseButton = this.page.getByRole("button", { name: exerciseName, exact: true });
 
     try {
-      await exerciseButton.waitFor({ state: 'visible', timeout: 5000 });
+      await exerciseButton.waitFor({ state: "visible", timeout: 5000 });
       await exerciseButton.click();
     } catch (error) {
       throw new Error(`Exercise with name "${exerciseName}" not found in the selector`);

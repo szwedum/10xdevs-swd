@@ -151,7 +151,7 @@ async function globalSetup(config: FullConfig) {
 
   // Submit the form and wait for the API call and navigation
   const [response] = await Promise.all([
-    page.waitForResponse((response) => response.url().includes('/api/auth/login') && response.status() === 200),
+    page.waitForResponse((response) => response.url().includes("/api/auth/login") && response.status() === 200),
     page.click('button[type="submit"]'),
   ]);
 

@@ -53,18 +53,18 @@ export function useCreateTemplate(): UseCreateTemplateResult {
     try {
       // Call the API endpoint instead of using browser Supabase client
       // This uses server-side authentication which properly handles RLS
-      const response = await fetch('/api/templates', {
-        method: 'POST',
+      const response = await fetch("/api/templates", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-        credentials: 'include', // Include cookies for authentication
+        credentials: "include", // Include cookies for authentication
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create template');
+        throw new Error(errorData.message || "Failed to create template");
       }
 
       const result: TemplateDetailDTO = await response.json();

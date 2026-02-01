@@ -90,6 +90,20 @@ const configFilesConfig = tseslint.config({
   },
 });
 
+const scriptsConfig = tseslint.config({
+  files: ["scripts/**/*.js", "scripts/**/*.ts"],
+  languageOptions: {
+    globals: {
+      console: true,
+      process: true,
+    },
+  },
+  rules: {
+    "no-console": "off",
+    "no-undef": "off",
+  },
+});
+
 const astroOverrides = {
   files: ["**/*.astro"],
   rules: {
@@ -108,6 +122,7 @@ export default tseslint.config(
   reactConfig,
   testConfig,
   configFilesConfig,
+  scriptsConfig,
   eslintPluginAstro.configs["flat/recommended"],
   eslintPluginPrettier,
   astroOverrides
